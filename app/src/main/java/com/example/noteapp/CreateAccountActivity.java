@@ -3,6 +3,7 @@ package com.example.noteapp;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
@@ -39,7 +40,7 @@ public class CreateAccountActivity extends AppCompatActivity {
         login = findViewById(R.id.login);
 
         button.setOnClickListener( view -> createAccount());
-        login.setOnClickListener(view -> finish());
+        login.setOnClickListener(view -> startActivity(new Intent(CreateAccountActivity.this, LoginActivity.class)));
     }
 
     public void createAccount() {
