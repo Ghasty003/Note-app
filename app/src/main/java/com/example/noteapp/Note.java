@@ -8,9 +8,6 @@ public class Note {
     String text;
     Timestamp timestamp;
 
-    public Note() {
-    }
-
     public String getTitle() {
         return title;
     }
