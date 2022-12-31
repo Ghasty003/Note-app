@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentReference;
+
 public class NoteDetailsActivity extends AppCompatActivity {
 
     private EditText titleEditText, textEditText;
@@ -31,5 +34,28 @@ public class NoteDetailsActivity extends AppCompatActivity {
             titleEditText.setError("Title is required");
             return;
         }
+
+        Note note = new Note();
+
+        note.setText(text);
+        note.setTitle(title);
+        note.setTimestamp(Timestamp.now());
+
+        saveNoteToFirebase(note);
+    }
+
+    void saveNoteToFirebase(Note note) {
+        DocumentReference documentReference = Utility.getCollectionRefrenceForNotes().document();
+
+        documentReference.set(note).addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                Utility.showToast(NoteDetailsActivity.this, task.getException().getLocalizedMessage());
+                return;
+            }
+
+            Utility.showToast(NoteDetailsActivity.this, "Note added successfully.");
+            finish();
+        });
+
     }
 }
