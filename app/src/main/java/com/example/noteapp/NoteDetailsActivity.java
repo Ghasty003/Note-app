@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
@@ -13,6 +14,9 @@ public class NoteDetailsActivity extends AppCompatActivity {
 
     private EditText titleEditText, textEditText;
     private ImageButton imageButton;
+    TextView textView;
+    String title, content, docId;
+    boolean isEditMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +26,22 @@ public class NoteDetailsActivity extends AppCompatActivity {
         titleEditText = findViewById(R.id.title);
         textEditText = findViewById(R.id.text);
         imageButton = findViewById(R.id.save_btn);
+        textView = findViewById(R.id.header_title);
+
+        title = getIntent().getStringExtra("title");
+        content = getIntent().getStringExtra("content");
+        docId = getIntent().getStringExtra("docId");
+
+        if (docId != null && !docId.isEmpty()) {
+            isEditMode = true;
+        }
+
+        titleEditText.setText(title);
+        textEditText.setText(content);
+
+        if (isEditMode) {
+            textView.setText("Edit your note");
+        }
 
         imageButton.setOnClickListener(v -> saveNote());
     }
@@ -45,17 +65,32 @@ public class NoteDetailsActivity extends AppCompatActivity {
     }
 
     void saveNoteToFirebase(Note note) {
-        DocumentReference documentReference = Utility.getCollectionRefrenceForNotes().document();
 
-        documentReference.set(note).addOnCompleteListener(task -> {
-            if (!task.isSuccessful()) {
-                Utility.showToast(NoteDetailsActivity.this, task.getException().getLocalizedMessage());
-                return;
-            }
+        DocumentReference documentReference;
 
-            Utility.showToast(NoteDetailsActivity.this, "Note added successfully.");
-            finish();
-        });
+        if (isEditMode) {
+             documentReference = Utility.getCollectionRefrenceForNotes().document(docId);
+                documentReference.set(note).addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Utility.showToast(NoteDetailsActivity.this, task.getException().getLocalizedMessage());
+                        return;
+                    }
+
+                    Utility.showToast(NoteDetailsActivity.this, "Note updated successfully");
+                    finish();
+                });
+        } else {
+             documentReference = Utility.getCollectionRefrenceForNotes().document();
+            documentReference.set(note).addOnCompleteListener(task -> {
+                if (!task.isSuccessful()) {
+                    Utility.showToast(NoteDetailsActivity.this, task.getException().getLocalizedMessage());
+                    return;
+                }
+
+                Utility.showToast(NoteDetailsActivity.this, "Note added successfully.");
+                finish();
+            });
+        }
 
     }
 }
