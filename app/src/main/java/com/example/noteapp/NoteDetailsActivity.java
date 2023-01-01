@@ -18,6 +18,8 @@ public class NoteDetailsActivity extends AppCompatActivity {
     String title, content, docId;
     boolean isEditMode = false;
 
+    ImageButton deleteBtn;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +29,7 @@ public class NoteDetailsActivity extends AppCompatActivity {
         textEditText = findViewById(R.id.text);
         imageButton = findViewById(R.id.save_btn);
         textView = findViewById(R.id.header_title);
+        deleteBtn = findViewById(R.id.deleteNote);
 
         title = getIntent().getStringExtra("title");
         content = getIntent().getStringExtra("content");
@@ -44,6 +47,10 @@ public class NoteDetailsActivity extends AppCompatActivity {
         }
 
         imageButton.setOnClickListener(v -> saveNote());
+
+        deleteBtn.setOnClickListener(view -> {
+            deleteNote();
+        });
     }
 
     public void saveNote() {
@@ -91,6 +98,20 @@ public class NoteDetailsActivity extends AppCompatActivity {
                 finish();
             });
         }
+    }
 
+    void deleteNote() {
+        String documentReference = Utility.getCollectionRefrenceForNotes().document().getId();
+
+        Utility.showToast(NoteDetailsActivity.this, documentReference);
+
+//        documentReference.delete().addOnCompleteListener(task -> {
+//            if (!task.isSuccessful()) {
+//                Utility.showToast(NoteDetailsActivity.this, "Unable to delete note");
+//                return;
+//            }
+//
+//            Utility.showToast(NoteDetailsActivity.this, "Note deleted successfully");
+//        });
     }
 }
